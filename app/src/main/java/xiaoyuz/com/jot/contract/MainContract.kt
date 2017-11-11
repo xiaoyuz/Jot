@@ -1,4 +1,4 @@
-package xiaoyuz.com.jot.task
+package xiaoyuz.com.jot.contract
 
 import xiaoyuz.com.jot.base.BasePresenter
 import xiaoyuz.com.jot.base.BaseView

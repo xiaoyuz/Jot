@@ -1,29 +1,50 @@
 package xiaoyuz.com.jot.activity
 
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Environment
+import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.content_main.*
-import org.jetbrains.anko.toast
 import xiaoyuz.com.jot.R
-import xiaoyuz.com.jot.task.MainContract
-import xiaoyuz.com.jot.task.presenter.MainPresenter
+import xiaoyuz.com.jot.contract.presenter.MainPresenter
+import xiaoyuz.com.jot.contract.view.MainFragment
+import xiaoyuz.com.jot.engine.JotApplication
+import xiaoyuz.com.jot.util.replaceFragmentInActivity
+import java.io.File
 
-class MainActivity : AppCompatActivity(), MainContract.View {
+class MainActivity : AppCompatActivity() {
 
-    override var presenter: MainContract.Presenter
-        get() = MainPresenter(this)
-        set(value) {}
+    private lateinit var mMainPresenter: MainPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+        checkPicStorage()
 
-        text.setOnClickListener { presenter.load(1) }
+        fab.setOnClickListener { view ->
+            // Jump to camera.
+        }
+
+        val mainFragment = supportFragmentManager.findFragmentById(R.id.content) as MainFragment?
+                ?: MainFragment().also { replaceFragmentInActivity(it, R.id.content) }
+        mMainPresenter = MainPresenter(mainFragment)
+    }
+
+    private fun checkPicStorage() {
+        // Check sd is exist.
+        val sdCardExist = Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
+        if (sdCardExist) {
+            val baseFolder = File(JotApplication.BASE_PIC_PATH)
+            if (!baseFolder.exists()) {
+                ActivityCompat.requestPermissions(this,
+                        arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -42,7 +63,13 @@ class MainActivity : AppCompatActivity(), MainContract.View {
         }
     }
 
-    override fun show(num: Int) {
-        toast(num.toString())
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
+                                            grantResults: IntArray) {
+        when(requestCode) {
+            1 -> if (grantResults[0]== PackageManager.PERMISSION_GRANTED) {
+                val baseFolder = File(JotApplication.BASE_PIC_PATH)
+                baseFolder.mkdirs()
+            }
+        }
     }
 }

@@ -1,6 +1,6 @@
-package xiaoyuz.com.jot.task.presenter
+package xiaoyuz.com.jot.contract.presenter
 
-import xiaoyuz.com.jot.task.MainContract
+import xiaoyuz.com.jot.contract.MainContract
 
 class MainPresenter(private val mView: MainContract.View): MainContract.Presenter {
 
