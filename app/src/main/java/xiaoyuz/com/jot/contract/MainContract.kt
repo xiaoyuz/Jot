@@ -2,14 +2,21 @@ package xiaoyuz.com.jot.contract
 
 import xiaoyuz.com.jot.base.BasePresenter
 import xiaoyuz.com.jot.base.BaseView
+import java.io.File
 
 interface MainContract {
 
     interface View: BaseView<Presenter> {
-        fun show(num: Int)
+        fun showFolders(folders: List<File>)
+
+        fun showCreateFolderDialog()
     }
 
     interface Presenter: BasePresenter {
-        fun load(num: Int)
+        fun loadFolders()
+
+        fun createFolder()
+
+        fun folderCreated(name: String)
     }
 }

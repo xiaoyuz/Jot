@@ -6,21 +6,25 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.folder_item.view.*
 import xiaoyuz.com.jot.R
+import xiaoyuz.com.jot.contract.MainContract
 
 private const val FOLDER_TYPE = 1
 private const val ADD_TYPE = 2
 
-class FolderAdapter(private val mFolderList: List<String>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class FolderAdapter(private val mFolderList: List<String>,
+                    private val mPresenter: MainContract.Presenter) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    class FolderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class FolderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         init {
             view.setOnClickListener{  }
         }
     }
 
-    class AddViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class AddViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         init {
-            view.setOnClickListener{  }
+            view.setOnClickListener {
+                mPresenter.createFolder()
+            }
         }
     }
 

@@ -2,7 +2,6 @@ package xiaoyuz.com.jot.activity
 
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Environment
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
@@ -12,9 +11,10 @@ import kotlinx.android.synthetic.main.activity_main.*
 import xiaoyuz.com.jot.R
 import xiaoyuz.com.jot.contract.presenter.MainPresenter
 import xiaoyuz.com.jot.contract.view.MainFragment
-import xiaoyuz.com.jot.engine.JotApplication
+import xiaoyuz.com.jot.util.checkSDExists
+import xiaoyuz.com.jot.util.createFolder
+import xiaoyuz.com.jot.util.folderExists
 import xiaoyuz.com.jot.util.replaceFragmentInActivity
-import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,13 +37,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkPicStorage() {
         // Check sd is exist.
-        val sdCardExist = Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
-        if (sdCardExist) {
-            val baseFolder = File(JotApplication.BASE_PIC_PATH)
-            if (!baseFolder.exists()) {
-                ActivityCompat.requestPermissions(this,
-                        arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
-            }
+        if (checkSDExists() && !folderExists()) {
+            ActivityCompat.requestPermissions(this,
+                    arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
         }
     }
 
@@ -67,8 +63,7 @@ class MainActivity : AppCompatActivity() {
                                             grantResults: IntArray) {
         when(requestCode) {
             1 -> if (grantResults[0]== PackageManager.PERMISSION_GRANTED) {
-                val baseFolder = File(JotApplication.BASE_PIC_PATH)
-                baseFolder.mkdirs()
+                createFolder()
             }
         }
     }
