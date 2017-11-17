@@ -10,6 +10,8 @@ interface MainContract {
         fun showFolders(folders: List<File>)
 
         fun showCreateFolderDialog()
+
+        fun openFolder(folderName: String)
     }
 
     interface Presenter: BasePresenter {
@@ -18,5 +20,7 @@ interface MainContract {
         fun createFolder()
 
         fun folderCreated(name: String)
+
+        fun openFolder(folderName: String)
     }
 }

@@ -24,4 +24,8 @@ class MainPresenter(private val mView: MainContract.View): MainContract.Presente
     override fun folderCreated(name: String) {
 
     }
+
+    override fun openFolder(folderName: String) {
+        mView.openFolder(folderName)
+    }
 }

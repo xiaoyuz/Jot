@@ -2,6 +2,7 @@ package xiaoyuz.com.jot.contract.view
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
@@ -12,8 +13,9 @@ import org.jetbrains.anko.alert
 import xiaoyuz.com.jot.R
 import xiaoyuz.com.jot.contract.MainContract
 import xiaoyuz.com.jot.contract.presenter.MainPresenter
+import xiaoyuz.com.jot.contract.presenter.PicListPresenter
 import xiaoyuz.com.jot.ui.adapter.FolderAdapter
-import xiaoyuz.com.jot.util.createFolder
+import xiaoyuz.com.jot.util.*
 import java.io.File
 
 class MainFragment : Fragment(), MainContract.View {
@@ -25,20 +27,19 @@ class MainFragment : Fragment(), MainContract.View {
         set(value) {}
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
-        val root = inflater.inflate(R.layout.content_main, container, false)
-        return root
-    }
+                              savedInstanceState: Bundle?): View?
+            = inflater.inflate(R.layout.content_main, container, false)
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
-        fileList.layoutManager = LinearLayoutManager(context)
-        fileList.adapter = FolderAdapter(mFolderNames, presenter)
+        folderList.layoutManager = LinearLayoutManager(context)
+        folderList.adapter = FolderAdapter(mFolderNames, presenter)
         presenter.loadFolders()
     }
 
     override fun showFolders(folders: List<File>) {
+        mFolderNames.clear()
         mFolderNames.addAll(folders.map { it.name })
-        fileList.adapter.notifyDataSetChanged()
+        folderList.adapter.notifyDataSetChanged()
     }
 
     override fun showCreateFolderDialog() {
@@ -46,7 +47,18 @@ class MainFragment : Fragment(), MainContract.View {
             val editText = EditText(context)
             customView(editText)
             cancellable(true)
-            positiveButton { createFolder(editText.text.toString()) }
+            positiveButton {
+                createFolder(editText.text.toString())
+                presenter.loadFolders()
+            }
         }).show()
+    }
+
+    override fun openFolder(folderName: String) {
+        val pics = listFiles(folderName)
+        val picListFragment = PicListFragment()
+        picListFragment.arguments = Bundle().apply { putString("folderName", folderName) }
+        (activity as AppCompatActivity).addFragment(picListFragment)
+        PicListPresenter(picListFragment)
     }
 }

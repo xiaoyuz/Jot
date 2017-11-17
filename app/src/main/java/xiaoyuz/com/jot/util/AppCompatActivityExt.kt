@@ -1,36 +1,32 @@
 package xiaoyuz.com.jot.util
 
-import android.support.annotation.IdRes
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
-import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
+import xiaoyuz.com.jot.R
 
-/**
- * The `fragment` is added to the container view with id `frameId`. The operation is
- * performed by the `fragmentManager`.
- */
-fun AppCompatActivity.replaceFragmentInActivity(fragment: Fragment, @IdRes frameId: Int) {
+
+fun AppCompatActivity.addFragment(fragment: Fragment) {
     supportFragmentManager.transact {
-        replace(frameId, fragment)
+        supportFragmentManager.let {
+            if (it.backStackEntryCount > 0) {
+                val fromFragment = it.findFragmentByTag(it.getBackStackEntryAt(it.backStackEntryCount - 1).name)
+                hide(fromFragment)
+            }
+            add(R.id.jot_fragment_container, fragment, fragment.javaClass.simpleName)
+            addToBackStack(fragment.javaClass.simpleName)
+        }
     }
 }
 
-/**
- * The `fragment` is added to the container view with tag. The operation is
- * performed by the `fragmentManager`.
- */
-fun AppCompatActivity.addFragmentToActivity(fragment: Fragment, tag: String) {
+fun AppCompatActivity.popFragment() {
+    supportFragmentManager.popBackStack()
     supportFragmentManager.transact {
-        add(fragment, tag)
-    }
-}
-
-fun AppCompatActivity.setupActionBar(@IdRes toolbarId: Int, action: ActionBar.() -> Unit) {
-    setSupportActionBar(findViewById(toolbarId))
-    supportActionBar?.run {
-        action()
+        supportFragmentManager.let {
+            val preFragment = it.findFragmentByTag(it.getBackStackEntryAt(it.backStackEntryCount - 1).name)
+            show(preFragment)
+        }
     }
 }
 
@@ -41,4 +37,5 @@ private inline fun FragmentManager.transact(action: FragmentTransaction.() -> Un
     beginTransaction().apply {
         action()
     }.commit()
+    executePendingTransactions()
 }

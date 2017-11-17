@@ -4,6 +4,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
+import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 
@@ -11,10 +12,10 @@ import kotlinx.android.synthetic.main.activity_main.*
 import xiaoyuz.com.jot.R
 import xiaoyuz.com.jot.contract.presenter.MainPresenter
 import xiaoyuz.com.jot.contract.view.MainFragment
+import xiaoyuz.com.jot.util.addFragment
 import xiaoyuz.com.jot.util.checkSDExists
 import xiaoyuz.com.jot.util.createFolder
 import xiaoyuz.com.jot.util.folderExists
-import xiaoyuz.com.jot.util.replaceFragmentInActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,8 +31,7 @@ class MainActivity : AppCompatActivity() {
             // Jump to camera.
         }
 
-        val mainFragment = supportFragmentManager.findFragmentById(R.id.content) as MainFragment?
-                ?: MainFragment().also { replaceFragmentInActivity(it, R.id.content) }
+        val mainFragment = MainFragment().also { addFragment(it) }
         mMainPresenter = MainPresenter(mainFragment)
     }
 
@@ -66,5 +66,16 @@ class MainActivity : AppCompatActivity() {
                 createFolder()
             }
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        super.onKeyDown(keyCode, event)
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (supportFragmentManager.backStackEntryCount == 1) {
+                finish()
+            }
+            return supportFragmentManager.backStackEntryCount >= 1
+        }
+        return false
     }
 }
